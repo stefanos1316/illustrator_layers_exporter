@@ -1,5 +1,5 @@
 const request = require('superagent');
-const dirSearch = require('C:/Program Files (x86)/Common Files/Adobe/CEP/extensions/my_first_extension/client/dirSearch/dirDFS.js');
+const dirSearch = require('C:/Program Files (x86)/Common Files/Adobe/CEP/extensions/illustrator_layer_exporter/client/dirSearch/dirDFS.js');
 const fs = require('fs');
 const lineByLine = require('n-readlines'); 
 
@@ -73,8 +73,8 @@ openButton.addEventListener("click", analyzeImage);
 function analyzeImage() {
 
     csInterface.evalScript("multi_exporter.init()", function(result) {
-      //uploadToServer(result);
-      alert('Files exportered ' + result);
+      alert('Uploaded all assets to project ' + document.getElementById("projects").value);
+      uploadToServer(result); 
     });
     
 }
@@ -85,6 +85,7 @@ function uploadToServer(dirPath) {
   // Get saved assets exported from Photoshop extension
   var dataPath = "C:/Users/acc/Downloads/layers_bounding_box.txt";
   var content=fs.readFileSync(dataPath, "utf8");
+
   fs.unlink(dataPath, function (err) {
     if (err) alert('[Error File Delete] ' + err.message);
   });
@@ -106,6 +107,7 @@ function uploadToServer(dirPath) {
   }
 
   var projectName = document.getElementById("projects").value;
+
   // Find the project that is currently selected and get its uuid
   for (var i = 0; i < projectsInfo.length; ++i) {
     if(projectsInfo[i].name == projectName) {
@@ -113,14 +115,17 @@ function uploadToServer(dirPath) {
     }
   }
 
+  dirPath = 'C:/Users/acc/Downloads/test/';
+
   if (projectName == "") {
     alert('No project was selected for uploading or user was not authendicated.');
+    return false;
   } else {
     dirSearch.dirDFS(dirPath, function (err, data) {
       if (err) {
         throw err;
       }
-
+    
       // Create project asset under the project and then uploading them
       data.forEach(function(entry) {
         fileNameWithExtensions = entry.split("\\");
@@ -130,6 +135,8 @@ function uploadToServer(dirPath) {
         // Apply similar magic as we did before for the assets's file
         fileNameNoExt = fileNameNoExt.replace(/\s+/g, '_');
         fileNameNoExt = fileNameNoExt.replace(/[&\/\\#,!+()$~%.'":*?<>{}]/g,'');
+
+        //alert('[File] ' + filenNameNoExt + ' element map ' + elementMap[fileNameNoExt]);
 
         // File info in array [name, x1, y1, x2, y2]
         if (elementMap.hasOwnProperty(fileNameNoExt)) {

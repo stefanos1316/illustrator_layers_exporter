@@ -12,13 +12,7 @@
 // 
 // Copyright 2011 Matthew Ericson
 
-//app.preferences.rulerUnits = Units.PIXELS;
 var docRef = app.activeDocument;	
-
-
-
-
-
 	
 // Format specific functionality
 getPng8Options = function ( transparency, scaling, embedImage, embedFont, trimEdges ) {
