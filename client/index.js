@@ -72,11 +72,10 @@ openButton.addEventListener("click", analyzeImage);
 
 function analyzeImage() {
 
-  alert('Until here I work, keep testing me bro');
-    // csInterface.evalScript("bootstrap()", function (result) {
-    //   uploadToServer(result);
-    // });
-
+    csInterface.evalScript("multi_exporter.init()", function(result) {
+      //uploadToServer(result);
+      alert('Files exportered ' + result);
+    });
     
 }
 

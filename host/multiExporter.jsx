@@ -12,7 +12,7 @@
 // 
 // Copyright 2011 Matthew Ericson
 
-
+//app.preferences.rulerUnits = Units.PIXELS;
 var docRef = app.activeDocument;	
 
 
@@ -186,14 +186,15 @@ var multi_exporter = {
 		var parse_success = this.load_prefs();	
 		
 		if (parse_success) {
-			this.show_dialog();
+			var dirDest = this.show_dialog();
+			return dirDest;
 		}
 	},
 
 	findExportTypeByCode: function(code){
 		for(var i=0; i<this.exportTypes.length; ++i){
 			var type = this.exportTypes[i];
-			if(type.code==code)return type;
+			if(type.code==code) return type;
 		}
 	},
 	
@@ -493,6 +494,8 @@ var multi_exporter = {
 		
 		this.checkFormat();
 		this.dlg.show();
+
+		return this.dirEt.text;
 	},
 
 	findDataIndex: function(data, selectList){
@@ -721,6 +724,15 @@ var multi_exporter = {
 				}else{
 					this.hide_all_layers();
 				}
+
+				// export layers
+        		// Also append all layes bounding boxes to file name layers_bounding_box.txt
+       		 	var filepath = '~/Downloads/layers_bounding_box.txt'; 
+        		var write_file = File(filepath);
+        		var out = write_file.open('a', undefined, undefined);
+        		write_file.encoding = "UTF-8";
+       		 	write_file.lineFeed = "Windows";
+        		write_file.writeln('{');
 				
 				for ( var j=0; j < this.export_layers.length; j++ ) {
 					var layer = docRef.layers[this.export_layers[j]];
@@ -733,6 +745,11 @@ var multi_exporter = {
 						if(layerRect==null)continue;
 
 						if (layerRect[0]<layerRect[2] && layerRect[1]>layerRect[3]) {
+
+							// Added for AllCanCode purposes
+							write_file.writeln('"' + lyr_name + '": [' + layerRect[0] + ', ' + layerRect[1]
+            				+ ', ' + layerRect[2] + ', ' + layerRect[3] + '], ') ;
+
 							var isVis = this.intersects(rect, layerRect);
 
 							if(!hasAdditLayers && !isVis && !this.trimEdges){
@@ -822,6 +839,11 @@ var multi_exporter = {
 					}
 					this.updateProgress(++num_exported);
 				}
+
+				// Close file
+        		write_file.writeln('}');
+        		write_file.close();
+
 				if(copyDoc){
 					copyDoc.close(SaveOptions.DONOTSAVECHANGES);
 					copyDoc = null;
@@ -1148,9 +1170,11 @@ var multi_exporter = {
 			layer = docRef.layers[layerIndices[i]];
 			layer.visible = true;
 		}
+
+		alert('I am the last function call')
 	}
 };
 
 
 
-multi_exporter.init();
+//multi_exporter.init();
